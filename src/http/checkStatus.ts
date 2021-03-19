@@ -6,7 +6,7 @@
  * @Description: http 请求状态码
  */
 
-export const checkStatus = (status: Number, response: any) => {
+export const checkStatus = (status: number, response: any) => {
   let message = '';
   switch (status) {
     case 200:

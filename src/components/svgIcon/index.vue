@@ -12,46 +12,46 @@
 </template>
 
 <script>
-export default {
-  name: 'SvgIcon',
-  props: {
-    name: {
-      type: String,
+  export default {
+    name: 'SvgIcon',
+    props: {
+      name: {
+        type: String,
+      },
+      className: {
+        type: String,
+      },
+      size: {
+        type: String,
+      },
     },
-    className: {
-      type: String,
+    data() {
+      return {
+        style: {},
+      };
     },
-    size: {
-      type: String,
+    computed: {
+      iconName() {
+        return `#${this.name}`;
+      },
+      svgClass() {
+        return ['icon-svg', `icon-svg-${this.name}`, this.className];
+      },
     },
-  },
-  data() {
-    return {
-      style: {},
-    };
-  },
-  computed: {
-    iconName() {
-      return `#${this.name}`;
+    mounted() {
+      this.style = {
+        fontSize: this.size,
+      };
     },
-    svgClass() {
-      return ['icon-svg', `icon-svg-${this.name}`, this.className];
-    },
-  },
-  mounted() {
-    this.style = {
-      fontSize: this.size,
-    };
-  },
-};
+  };
 </script>
 
 <style>
-.icon-svg {
-  width: 1em;
-  height: 1em;
-  vertical-align: -0.15em;
-  fill: currentColor;
-  overflow: hidden;
-}
+  .icon-svg {
+    width: 1em;
+    height: 1em;
+    vertical-align: -0.15em;
+    fill: currentColor;
+    overflow: hidden;
+  }
 </style>

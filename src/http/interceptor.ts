@@ -86,7 +86,7 @@ export class Interceptors {
     }, error => {
       const response: any = error.response;
       if (response) {
-        let message= checkStatus(response.status,response)
+        const message= checkStatus(response.status,response)
         console.error(message);
       }  
     })

@@ -22,11 +22,11 @@ class Operator {
    * 服务接口添加后台操作人员
    */
   private serviceAddOperator(): void {
-    let serviceArr = this.service.filter((v: any) => this.url.indexOf(v.key) >= 0)[0];
+    const serviceArr = this.service.filter((v: any) => this.url.indexOf(v.key) >= 0)[0];
     if (serviceArr) {
-      let service = serviceArr.key;
-      let operator = serviceArr.value;
-      let urlArr = this.url.split('/');
+      const service = serviceArr.key;
+      const operator = serviceArr.value;
+      const urlArr = this.url.split('/');
       urlArr[0] = `${service}${operator ? '-' : ''}${operator}`;
       this.url = urlArr.join('/');
     }
