@@ -1,5 +1,6 @@
 <template>
   <div id="nav">
+    <svg-icon name="icon-auth"></svg-icon>
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link>
   </div>
@@ -13,6 +14,8 @@
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   color: #2c3e50;
+  display: flex;
+  transform: scale(0.8);
 }
 
 #nav {
