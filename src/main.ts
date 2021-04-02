@@ -5,6 +5,7 @@ import router, { setupRouter } from '@/router';
 import { setupStore } from '@/store';
 
 import { setupElementPlus, setupCustomComponents } from '@/plugins';
+import '@/design/reset.scss';
 (async () => {
   const app = createApp(App);
 

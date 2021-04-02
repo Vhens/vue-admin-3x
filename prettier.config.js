@@ -2,7 +2,7 @@
  * @Author: Vhen
  * @Date: 2021-03-02 17:00:43
  * @LastEditors: Vhen
- * @LastEditTime: 2021-03-19 10:54:14
+ * @LastEditTime: 2021-03-31 14:23:55
  * @Description:
  */
 module.exports = {
@@ -12,16 +12,16 @@ module.exports = {
   semi: true,
   vueIndentScriptAndStyle: true,
   singleQuote: true,
-  quoteProps: 'as-needed',
+  quoteProps: "as-needed",
   bracketSpacing: true,
-  trailingComma: 'es5',
+  trailingComma: "es5",
   jsxBracketSameLine: false,
   jsxSingleQuote: false,
-  arrowParens: 'always',
+  arrowParens: "always",
   insertPragma: false,
   requirePragma: false,
-  proseWrap: 'never',
-  htmlWhitespaceSensitivity: 'strict',
-  endOfLine: 'lf',
-  rangeStart: 0,
+  proseWrap: "never",
+  htmlWhitespaceSensitivity: "strict",
+  endOfLine: "lf",
+  rangeStart: 0
 };
