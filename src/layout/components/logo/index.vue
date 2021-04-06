@@ -8,7 +8,12 @@
           'v-is-link': enableDashboard,
         }"
       >
-        <img v-if="showLogo" :src="logo" class="v-logo" />
+        <img
+          v-if="showLogo"
+          :src="logo"
+          class="v-logo"
+          :class="{ minlogo: !store.state.app.showHeader }"
+        />
         <span v-if="showTitle">{{ title }}</span>
       </div>
     </router-link>
@@ -48,6 +53,7 @@
       return {
         ...toRefs(state),
         to,
+        store,
       };
     },
   });
@@ -75,6 +81,11 @@
         & + span {
           margin-left: 10px;
         }
+      }
+      .minlogo {
+        width: 40px;
+        height: 40px;
+        margin-left: 2px;
       }
       span {
         display: block;

@@ -2,11 +2,11 @@
  * @Author: Vhen
  * @Date: 2021-03-03 10:07:35
  * @LastEditors: Vhen
- * @LastEditTime: 2021-03-16 15:07:41
+ * @LastEditTime: 2021-04-06 11:28:33
  * @Description: 
 -->
 <template>
-  <svg :class="svgClass" aria-hidden="true">
+  <svg :class="svgClass" aria-hidden="true" class="svg-icon ">
     <use :xlink:href="iconName"></use>
   </svg>
 </template>

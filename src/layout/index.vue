@@ -28,7 +28,7 @@
                   @click="$store.commit('menu/switchNavActive', index)"
                 >
                   <svg-icon v-if="item.meta.icon" :name="item.meta.icon" />
-                  <span v-if="item.meta.title">{{ item.meta.title }}</span>
+                  <span class="title" v-if="item.meta.title">{{ item.meta.title }}</span>
                 </div>
               </template>
             </div>
@@ -40,13 +40,8 @@
       <div class="v-wrapper">
         <div
           class="v-sidebar-container"
-          :class="{ show: store.state.app.mode === 'mobile' && !store.state.app.sidebarCollapse }"
+          :class="{ show1: store.state.app.mode === 'mobile' && !store.state.app.sidebarCollapse }"
         >
-          1111111111
-          {{
-            (!store.state.app.showHeader || store.state.app.mode == 'mobile') &&
-              (store.state.menu.routes.length >= 1 || store.state.app.alwaysShowMainSidebar)
-          }}
           <div
             v-if="
               (!store.state.app.showHeader || store.state.app.mode == 'mobile') &&
@@ -55,7 +50,7 @@
             class="main-sidebar-container"
           >
             <v-logo :show-title="false" class="sidebar-logo" />
-            <div class="nav">
+            <div class="v-nav">
               <template v-for="(item, index) in store.state.menu.routes">
                 <div
                   v-if="item.children && item.children.length !== 0"
@@ -65,10 +60,10 @@
                     active: index == store.state.menu.navActiveIndex,
                   }"
                   :title="item.meta.title"
-                  @click="$store.commit('menu/switchNavActive', index)"
+                  @click="store.commit('menu/switchNavActive', index)"
                 >
                   <svg-icon v-if="item.meta.icon" :name="item.meta.icon" />
-                  <span>{{ item.meta.title }}</span>
+                  <span class="title">{{ item.meta.title }}</span>
                 </div>
               </template>
             </div>
@@ -79,13 +74,25 @@
               'v-sub-sidebar-container': true,
               'is-collapse': store.state.app.mode == 'pc' && store.state.app.sidebarCollapse,
             }"
+            @scroll="onSidebarScroll"
           >
+            <v-logo
+              :show-logo="
+                store.state.menu.routes.length <= 1 && !store.state.app.alwaysShowMainSidebar
+              "
+              :class="{
+                'sidebar-logo': true,
+                'sidebar-logo-bg':
+                  store.state.menu.routes.length <= 1 && !store.state.app.alwaysShowMainSidebar,
+                shadow: sidebarScrollTop,
+              }"
+            />
             <el-menu
               :background-color="styles.v_sub_sidebar_bg"
               :text-color="styles.v_sub_sidebar_menu_color"
               :active-text-color="styles.v_sub_sidebar_menu_active_color"
               unique-opened
-              :default-active="routes.path.value"
+              :default-active="routes.path"
               :collapse="store.state.app.mode === 'pc' && store.state.app.sidebarCollapse"
               :collapse-transition="false"
               :class="{
@@ -117,13 +124,16 @@
         />
         <!-- 右侧主体内容区 -->
         <div class="v-main-container">
-          <router-view v-slot="{ Component }">
-            <transition name="main" mode="out-in">
-              <keep-alive v-if="isRouterAlive" :include="store.state.keepAlive.list">
-                <component class="view" :is="Component" />
-              </keep-alive>
-            </transition>
-          </router-view>
+          <div class="view">
+            <navbar :class="{ shadow: scrollTop }" />
+            <router-view v-slot="{ Component }">
+              <transition name="main" mode="out-in">
+                <keep-alive v-if="isRouterAlive" :include="store.state.keepAlive.list">
+                  <component :is="Component" />
+                </keep-alive>
+              </transition>
+            </router-view>
+          </div>
         </div>
       </div>
       <el-backtop :right="20" :bottom="20" title="回到顶部" />
@@ -144,7 +154,7 @@
     onUnmounted,
   } from 'vue';
   import { useStore } from 'vuex';
-  import { useRouter, useRoute } from 'vue-router';
+  import { useRouter, useRoute, onBeforeRouteUpdate } from 'vue-router';
   // @ts-ignore
   const variables: any = require('@/design/variables.scss');
 
@@ -152,6 +162,7 @@
   import vUserMenu from './components/userMenu/index.vue';
   import vThemeSetting from './components/themeSetting/index.vue';
   import vSidebarItem from './components/sidebarItem/index.vue';
+  import navbar from './components/navbar/index.vue';
 
   export default defineComponent({
     components: {
@@ -159,6 +170,7 @@
       vUserMenu,
       vThemeSetting,
       vSidebarItem,
+      navbar,
     },
     setup() {
       const store = useStore();
@@ -217,11 +229,9 @@
       const onScroll = () => {
         state.scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
       };
-      const routeChange = (newVal: any, oldVal: any) => {
-        if (newVal.name == oldVal.name) {
-          reload();
-        }
-      };
+      onBeforeRouteUpdate(() => {
+        reload();
+      });
       onMounted(() => {
         window.addEventListener('scroll', onScroll);
       });
@@ -289,21 +299,24 @@
           display: flex;
           margin-left: 50px;
           .item {
-            margin: 0 10px;
+            display: flex;
+            align-items: center;
             padding: 10px;
-            border-radius: 10px;
+            height: $v-header-height;
+            // border-radius: 10px;
             cursor: pointer;
             transition: all 0.3s;
+            border-left: 2px solid $v-header-menu-active-bg;
             &.active,
             &:hover {
               background-color: $v-header-menu-active-bg;
             }
             .svg-icon {
               font-size: 20px;
-              & + span {
-                display: inline-block;
-                margin-left: 15px;
-              }
+            }
+            .title {
+              display: inline-block;
+              margin-left: 15px;
             }
           }
         }
@@ -322,7 +335,7 @@
       .v-main-container {
         display: flex;
         flex-direction: column;
-        min-height: calc(100vh - 70px);
+        min-height: 100%;
         margin-left: $v-sidebar-width;
         background-color: #f5f7f9;
         box-shadow: 1px 0 0 0 darken($v-main-bg, 10);
@@ -359,9 +372,70 @@
         }
       }
       .v-main-container {
+        .navbar {
+          top: $v-header-height;
+          ::v-deep .user {
+            display: none;
+          }
+        }
       }
     }
-
+    .main-sidebar-container {
+      width: $v-main-sidebar-width;
+      background-color: $v-main-sidebar-bg;
+      color: #fff;
+      .sidebar-logo {
+        transition: 0.3s;
+        background-color: $v-main-sidebar-bg;
+      }
+      .v-nav {
+        width: 100%;
+        // padding-top: $v-sidebar-logo-height;
+        .item {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          width: 100%;
+          height: 60px;
+          padding: 0 5px;
+          cursor: pointer;
+          transition: 0.3s;
+          &.active,
+          &:hover {
+            background-color: $v-main-sidebar-menu-active-bg;
+          }
+          .svg-icon {
+            margin: 0 auto;
+            font-size: 20px;
+          }
+          .title {
+            text-align: center;
+            font-size: 14px;
+            padding: 4px;
+            @include text-overflow;
+          }
+        }
+      }
+    }
+    .v-main-container {
+      display: flex;
+      flex-direction: column;
+      min-height: 100%;
+      margin-left: $v-sidebar-width;
+      background-color: #f5f7f9;
+      box-shadow: 1px 0 0 0 darken($v-main-bg, 10);
+      transition: 0.3s;
+      .view {
+        position: relative;
+        min-height: 100%;
+        flex: auto;
+        padding: $v-topbar-height 0 0;
+        overflow: hidden;
+      }
+    }
+    .main-sidebar-container + .v-sub-sidebar-container {
+      left: $v-main-sidebar-width;
+    }
     .v-sidebar-container {
       position: fixed;
       z-index: 1020;
@@ -369,6 +443,7 @@
       bottom: 0;
       display: flex;
       width: var(--real-sidebar-width);
+      .main-sidebar-container,
       .v-sub-sidebar-container {
         transition: 0.3s;
         overflow-x: hidden;
@@ -403,6 +478,7 @@
       }
       .sidebar-logo {
         background: $v-sub-sidebar-bg;
+        border-bottom: 1px solid #e8e8e8;
         transition: box-shadow 0.2s, background-color 0.3s, color 0.3s;
         &:not(.sidebar-logo-bg) {
           ::v-deep span {
@@ -418,7 +494,7 @@
       }
       .el-menu {
         border-right: 0;
-        padding-top: $v-sidebar-logo-height;
+        // padding-top: $v-sidebar-logo-height;
         transition: border-color 0.3s, background-color 0.3s, color 0.3s;
         &:not(.el-menu--collapse) {
           width: inherit;
