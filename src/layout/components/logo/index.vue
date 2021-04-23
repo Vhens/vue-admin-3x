@@ -46,7 +46,7 @@
       const to = computed(() => {
         const rtn: any = {};
         if (state.enableDashboard) {
-          rtn.path = 'dashboard';
+          rtn.path = '/dashboard';
         }
         return rtn;
       });

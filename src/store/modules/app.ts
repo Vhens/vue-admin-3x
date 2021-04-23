@@ -2,7 +2,7 @@
  * @Author: Vhen
  * @Date: 2021-03-23 16:09:33
  * @LastEditors: Vhen
- * @LastEditTime: 2021-04-06 11:50:50
+ * @LastEditTime: 2021-04-07 09:48:25
  * @Description:
  */
 import { deepClone } from '@/utils/tool';
@@ -96,6 +96,11 @@ export default {
     isShowThemeSetting: false,
 
     sidebarCollapseLastStatus: false,
+
+    // 是否开启导航搜索
+    enableNavSearch: true,
+    //显示.隐藏导航搜索
+    isShowNavSearch: false,
   },
   mutations: {
     // 设置访问模式，页面宽度小于 992px 时切换为移动端展示
@@ -120,6 +125,10 @@ export default {
     // 更新主题配置
     updateThemeSetting(state: any, data: any) {
       Object.assign(state, data);
+    },
+    // 显示隐藏导航搜索
+    switchNavSearch(state: any) {
+      state.isShowNavSearch = !state.isShowNavSearch;
     },
   },
   actions: {},

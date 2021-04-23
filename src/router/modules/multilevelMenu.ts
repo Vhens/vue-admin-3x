@@ -2,8 +2,8 @@
  * @Author: Vhen
  * @Date: 2021-04-01 14:06:24
  * @LastEditors: Vhen
- * @LastEditTime: 2021-04-02 11:39:44
- * @Description: 多级导航
+ * @LastEditTime: 2021-04-07 09:15:40
+ * @Description: 多级菜单
  */
 import Layout from '@/layout/index.vue';
 import EmptyLayout from '@/layout/empty.vue';
@@ -14,8 +14,8 @@ export default {
   redirect: '/multilevel_menu/index',
   name: 'multilevelMenuExample',
   meta: {
-    title: '多级导航',
-    icon: 'sidebar-menu',
+    title: '多层级菜单',
+    icon: 'menu',
   },
   children: [
     {
@@ -24,7 +24,7 @@ export default {
       component: () =>
         import(/* webpackChunkName: 'multilevel_menu' */ '@/views/multilevelMenu/level1/index.vue'),
       meta: {
-        title: '导航1',
+        title: '菜单1',
       },
     },
     {
@@ -33,7 +33,7 @@ export default {
       redirect: '/multilevel_menu/level2/index',
       component: EmptyLayout,
       meta: {
-        title: '导航2',
+        title: '菜单2',
       },
       children: [
         {
@@ -44,7 +44,7 @@ export default {
               /* webpackChunkName: 'multilevel_menu' */ '@/views/multilevelMenu/level2/index.vue'
             ),
           meta: {
-            title: '导航2-1',
+            title: '菜单2-1',
           },
         },
         {
@@ -53,7 +53,7 @@ export default {
           redirect: '/multilevel_menu/level2/level3/index',
           component: EmptyLayout,
           meta: {
-            title: '导航2-2',
+            title: '菜单2-2',
           },
           children: [
             {
@@ -64,7 +64,7 @@ export default {
                   /* webpackChunkName: 'multilevel_menu' */ '@/views/multilevelMenu/level2/level3/index.vue'
                 ),
               meta: {
-                title: '导航3-1',
+                title: '菜单3-1',
               },
             },
           ],

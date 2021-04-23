@@ -22,7 +22,9 @@ const constantRoutes: Array<RouteRecordRaw> = [
   {
     path: '/',
     component: Layout,
-    redirect: '/dashboard',
+    redirect: {
+      name: '/dashboard',
+    },
     children: [
       {
         path: 'dashboard',
@@ -35,6 +37,12 @@ const constantRoutes: Array<RouteRecordRaw> = [
           affix: false,
           icon: '',
         },
+      },
+      {
+        path: 'personal_center',
+        name: 'personal_center',
+        component: () =>
+          import(/* webpackChunkName: "dashboard" */ '@/views/personalCenter/index.vue'),
       },
       {
         path: 'reload',
@@ -110,11 +118,18 @@ export const setupRouter = (app: App) => {
 
 // 重新添加路由并消除路由重复警告
 const selfAddRoutes = (route: any) => {
-  route.forEach((item: any) => router.addRoute(item));
+  route.forEach((item: any) => {
+    router.addRoute(item);
+  });
 };
 
 router.beforeEach(async (to, from, next) => {
-  NProgress.start();
+  // @ts-ignore
+  store.state.app.enableProgress && NProgress.start();
+  // @ts-ignore
+  if (store.state.menu.isGenerate) {
+    store.commit('menu/setNavActive', to.path);
+  }
   // @ts-ignore
   if (!store.state.menu.isGenerate) {
     const accessRoutes = await store.dispatch('menu/generateRoutes', {

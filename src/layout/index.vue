@@ -139,6 +139,7 @@
       <el-backtop :right="20" :bottom="20" title="回到顶部" />
     </div>
     <v-theme-setting></v-theme-setting>
+    <search />
   </div>
 </template>
 
@@ -163,6 +164,7 @@
   import vThemeSetting from './components/themeSetting/index.vue';
   import vSidebarItem from './components/sidebarItem/index.vue';
   import navbar from './components/navbar/index.vue';
+  import search from './components/search/index.vue';
 
   export default defineComponent({
     components: {
@@ -171,12 +173,12 @@
       vThemeSetting,
       vSidebarItem,
       navbar,
+      search,
     },
     setup() {
       const store = useStore();
       const router = useRouter();
       const routes = useRoute();
-      console.log(routes);
       const state = reactive({
         isRouterAlive: true,
         sidebarScrollTop: 0,
@@ -257,7 +259,7 @@
     .v-sidebar-container {
       transition: 0.3s;
       transform: translateX(calc(-1 * #{$v-sidebar-width}));
-      &.show {
+      &.show1 {
         transform: translateX(0);
       }
     }

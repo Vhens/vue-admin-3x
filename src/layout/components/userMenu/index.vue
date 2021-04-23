@@ -2,6 +2,16 @@
   <div class="v-user-menu">
     <div class="v-tools">
       <el-tooltip
+        v-if="store.state.app.enableNavSearch"
+        effect="dark"
+        content="搜索页面"
+        placement="bottom"
+      >
+        <span class="item" @click="store.commit('app/switchNavSearch')">
+          <svg-icon name="search" />
+        </span>
+      </el-tooltip>
+      <el-tooltip
         v-if="
           store.state.app.mode === 'pc' && isFullscreenEnable && store.state.app.enableFullscreen
         "
@@ -36,7 +46,7 @@
     </div>
     <el-dropdown class="v-user-container" @command="handleCommand">
       <span class="el-dropdown-link v-user-wrapper">
-        <el-avatar size="medium">
+        <el-avatar size="medium" src="https://it.jzgylm.cn/lf.jpg">
           <i class="el-icon-user-solid" />
         </el-avatar>
         vhen
@@ -44,7 +54,7 @@
       </span>
       <template #dropdown>
         <el-dropdown-menu>
-          <el-dropdown-item command="setting">个人设置</el-dropdown-item>
+          <el-dropdown-item command="setting">个人中心</el-dropdown-item>
           <el-dropdown-item divided command="logout">退出登录</el-dropdown-item>
         </el-dropdown-menu>
       </template>
@@ -80,17 +90,17 @@
         switch (command) {
           case 'dashboard':
             router.push({
-              path: 'dashboard',
+              path: '/dashboard',
             });
             break;
           case 'setting':
             router.push({
-              path: 'personalSetting',
+              path: '/personal_center',
             });
             break;
           case 'logout':
             router.push({
-              path: 'login',
+              path: '/login',
             });
             break;
         }

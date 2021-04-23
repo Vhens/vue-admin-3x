@@ -2,7 +2,7 @@
  * @Author: Vhen
  * @Date: 2021-04-01 15:06:40
  * @LastEditors: Vhen
- * @LastEditTime: 2021-04-02 14:34:00
+ * @LastEditTime: 2021-04-22 13:53:43
  * @Description:
  */
 
@@ -40,6 +40,7 @@ const mutations = {
           return path.indexOf(v.path + '/') === 0 || path == v.path;
         })
       ) {
+        console.log('index', index);
         state.navActiveIndex = index;
       }
     });
