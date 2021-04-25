@@ -1,6 +1,41 @@
 <template>
   <div class="images-upload">
+    <div v-for="(item, index) in url" :key="index" class="images">
+      <el-image
+        v-if="index < max"
+        :src="item"
+        :style="`width:${width}px;height:${height}px;`"
+        fit="cover"
+      />
+      <div class="mask">
+        <div class="actions">
+          <span title="预览" @click="preview(index)">
+            <i class="el-icon-zoom-in" />
+          </span>
+          <span title="移除" @click="remove(index)">
+            <i class="el-icon-delete" />
+          </span>
+          <span
+            v-show="url.length > 1"
+            title="左移"
+            :class="{ disabled: index == 0 }"
+            @click="move(index, 'left')"
+          >
+            <i class="el-icon-back" />
+          </span>
+          <span
+            v-show="url.length > 1"
+            title="右移"
+            :class="{ disabled: index == url.length - 1 }"
+            @click="move(index, 'right')"
+          >
+            <i class="el-icon-right" />
+          </span>
+        </div>
+      </div>
+    </div>
     <el-upload
+      v-show="url.length < max"
       :show-file-list="false"
       :headers="headers"
       :action="action"
@@ -10,31 +45,10 @@
       :on-progress="onProgress"
       :on-success="onSuccess"
       drag
+      class="images-upload"
     >
-      <el-image
-        v-if="url === ''"
-        :src="url === '' ? placeholder : url"
-        :style="`width:${width}px;height:${height}px;`"
-        fit="fill"
-      >
-        <template #error>
-          <div class="image-slot">
-            <i class="el-icon-plus" />
-          </div>
-        </template>
-      </el-image>
-      <div v-else class="image">
-        <el-image :src="url" :style="`width:${width}px;height:${height}px;`" fit="fill" />
-        <div class="mask">
-          <div class="actions">
-            <span title="预览" @click.stop="dialogVisible = true">
-              <i class="el-icon-zoom-in" />
-            </span>
-            <span title="移除" @click.stop="remove">
-              <i class="el-icon-delete" />
-            </span>
-          </div>
-        </div>
+      <div class="image-slot" :style="`width:${width}px;height:${height}px;`">
+        <i class="el-icon-plus" />
       </div>
       <div
         v-show="progress.percent"
@@ -59,7 +73,7 @@
           :title="
             `上传图片支持 ${ext.join(
               ' / '
-            )} 格式，且图片大小不超过 ${size}MB，建议图片尺寸为 ${width}*${height}`
+            )} 格式，单张图片大小不超过 ${size}MB，建议图片尺寸为 ${width}*${height}，且图片数量不超过 ${max} 张`
           "
           type="info"
           show-icon
@@ -67,23 +81,31 @@
         />
       </div>
     </div>
-    <el-dialog v-model="dialogVisible" title="预览" width="800px">
-      <img :src="url" style="display: block; max-width: 100%; margin: 0 auto;" />
-    </el-dialog>
+    <el-image-viewer
+      v-if="imageViewerVisible"
+      :on-close="
+        () => {
+          imageViewerVisible = false;
+        }
+      "
+      :url-list="[dialogImageUrl]"
+    />
   </div>
 </template>
 
 <script lang="ts">
+  import { defineComponent, reactive, toRefs, getCurrentInstance } from 'vue';
+
   interface IState {
-    dialogVisible: boolean;
+    dialogImageUrl: any;
+    imageViewerVisible: boolean;
     progress: {
       preview: string;
       percent: number;
     };
   }
-  import { defineComponent, reactive, toRefs, getCurrentInstance } from 'vue';
   export default defineComponent({
-    name: 'ImageUpload',
+    name: 'ImagesUpload',
     props: {
       action: {
         type: String,
@@ -102,8 +124,12 @@
         default: 'file',
       },
       url: {
-        type: String,
-        default: '',
+        type: Array,
+        default: () => [],
+      },
+      max: {
+        type: Number,
+        default: 3,
       },
       size: {
         type: Number,
@@ -130,51 +156,57 @@
         default: () => ['jpg', 'png', 'gif', 'bmp'],
       },
     },
-
     setup(props, context) {
-      /*************************数据层********************************** */
+      // @ts-ignore
+      const { ctx } = getCurrentInstance();
+      /**************************数据层******************************** */
       const state: IState = reactive({
-        dialogVisible: false,
+        dialogImageUrl: '',
+        imageViewerVisible: false,
         progress: {
           preview: '',
           percent: 0,
         },
       });
-      /*************************函数层******************************************* */
-      /**
-       * 移除图片
-       */
+      /***************************函数层**************************************** */
+      // 预览
+      const preview = (index: number) => {
+        state.dialogImageUrl = props.url[index];
+        state.imageViewerVisible = true;
+      };
+      // 移除
       const remove = (index: number) => {
         let url = props.url;
         url.splice(index, 1);
         context.emit('update:url', url);
       };
-      /**
-       * 上传图片之前限制图片
-       */
+      // 移动
+      const move = (index: number, type: string) => {
+        let url = props.url;
+        if (type == 'left' && index != 0) {
+          url[index] = url.splice(index - 1, 1, url[index])[0];
+        }
+        if (type == 'right' && index != url.length - 1) {
+          url[index] = url.splice(index + 1, 1, url[index])[0];
+        }
+        context.emit('update:url', url);
+      };
       const beforeUpload = (file: any) => {
         const fileName = file.name.split('.');
         const fileExt = fileName[fileName.length - 1];
         const isTypeOk = props.ext.indexOf(fileExt) >= 0;
         const isSizeOk = file.size / 1024 / 1024 < props.size;
         if (!isTypeOk) {
-          getCurrentInstance()?.appContext.config.globalProperties.$message.success.$message.error(
-            `上传图片只支持 ${props.ext.join(' / ')} 格式！`
-          );
+          ctx.$message.error(`上传图片只支持 ${props.ext.join(' / ')} 格式！`);
         }
         if (!isSizeOk) {
-          getCurrentInstance()?.appContext.config.globalProperties.$message.success.$message.error(
-            `上传图片大小不能超过 ${props.size}MB！`
-          );
+          ctx.$message.error(`上传图片大小不能超过 ${props.size}MB！`);
         }
         if (isTypeOk && isSizeOk) {
           state.progress.preview = URL.createObjectURL(file);
         }
         return isTypeOk && isSizeOk;
       };
-      /**
-       * 进度条
-       */
       const onProgress = (file: any) => {
         state.progress.percent = ~~file.percent;
         if (state.progress.percent == 100) {
@@ -182,15 +214,14 @@
           state.progress.percent = 0;
         }
       };
-      /**
-       * 上传成功回调
-       */
       const onSuccess = (res: any) => {
         context.emit('on-success', res);
       };
       return {
         ...toRefs(state),
+        preview,
         remove,
+        move,
         beforeUpload,
         onProgress,
         onSuccess,
@@ -200,8 +231,16 @@
 </script>
 <style lang="scss" scoped>
   .images-upload {
-    .image {
+    .images {
       position: relative;
+      display: inline-block;
+      margin-right: 10px;
+      border: 1px dashed #d9d9d9;
+      border-radius: 6px;
+      overflow: hidden;
+      .el-image {
+        display: block;
+      }
       .mask {
         opacity: 0;
         position: absolute;
@@ -239,6 +278,9 @@
         opacity: 1;
       }
     }
+    .images-upload {
+      display: inline-block;
+    }
     ::v-deep .el-upload {
       .el-upload-dragger {
         width: auto;
@@ -246,18 +288,15 @@
         &.is-dragover {
           border-width: 1px;
         }
-        .el-image {
-          display: block;
-          .image-slot {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            width: 100%;
-            height: 100%;
-            color: #909399;
-            font-size: 30px;
-            background-color: transparent;
-          }
+        .image-slot {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 100%;
+          height: 100%;
+          color: #909399;
+          font-size: 30px;
+          background-color: transparent;
         }
         .progress {
           position: absolute;
