@@ -146,6 +146,7 @@
        */
       const remove = (index: number) => {
         let url = props.url;
+        // @ts-ignore
         url.splice(index, 1);
         context.emit('update:url', url);
       };
